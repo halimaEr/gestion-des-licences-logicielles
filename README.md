@@ -222,39 +222,6 @@ Les microservices communiquent principalement à travers des API REST.
 
 ---
 
-## Structure du projet
-
-```text
-str-project/
-│
-├── affectation-service/
-│
-├── authentication-service/
-│
-├── demande-service/
-│
-├── departement/
-│
-├── employe-service/
-│
-├── logiciel/
-│
-├── service-config/
-│
-├── service-discovery/
-│
-├── service-proxy/
-│
-├── frontend/
-│
-├── src/
-│
-├── .gitignore
-├── .gitattributes
-├── pom.xml
-├── mvnw
-└── mvnw.cmd
-```
 
 ## Prérequis
 
