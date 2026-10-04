@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: proxy
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: authentication-service
+              uri: http://localhost:8081
+              predicates:
+                - Path=/authentication-service/**
+              filters:
+                - StripPrefix=1
+
+            - id: employe-service
+              uri: http://localhost:8099
+              predicates:
+                - Path=/employe-service/**
+              filters:
+                - StripPrefix=1
+
+            - id: departements-service
+              uri: http://localhost:8089
+              predicates:
+                - Path=/departements-service/**
+              filters:
+                - StripPrefix=1
+            - id: demande-service
+              uri: http://localhost:8084
+              predicates:
+                - Path=/demande-service/**
+              filters:
+                - StripPrefix=1
+            - id: affectation-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/affectation-service/**
+              filters:
+                - StripPrefix=1
+            - id: logiciel-service
+              uri: http://localhost:8093
+              predicates:
+                - Path=/logiciel-service/**
+              filters:
+                - StripPrefix=1
+    config:
+      import-check:
+        enabled: false
+  config:
+    import: configserver:http://localhost:8888
+
+server:
+  port: 8088
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    hostname: localhost
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG

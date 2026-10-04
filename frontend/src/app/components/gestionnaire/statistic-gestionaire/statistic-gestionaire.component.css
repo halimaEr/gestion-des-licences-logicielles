@@ -1,0 +1,52 @@
+
+  canvas {
+    max-height: 288px !important; /* 72 * 4 = 288 */
+    margin: 0 auto;
+    display: block;
+  }
+
+  .stats-dashboard {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.stat-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.license-status, .chart-container {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+.license-status li {
+  transition: all 0.2s ease;
+}
+
+.license-status li:hover {
+  background-color: #f0f4f8;
+  transform: translateX(5px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .license-status, .chart-container {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .license-status, .chart-container {
+    min-height: auto;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

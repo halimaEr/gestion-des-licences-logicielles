@@ -1,0 +1,30 @@
+<!-- ========== NAVBAR FIXE ========== -->
+<nav class="bg-white shadow-md">
+  <app-layout></app-layout>
+  <!-- Barre de navigation -->
+  <div class="w-full bg-gray-200 px-4 py-2 flex flex-wrap justify-center sm:justify-start gap-y-2 gap-x-8 sm:gap-x-12 md:gap-x-16">
+
+    <div class="relative">
+      <a  (click)="goToDemandes()"   class="flex items-center text-red-750 cursor-pointer hover:text-red-700">
+        <i class="	fas fa-folder-open mr-2"></i>
+        Demandes
+      </a>
+    </div>
+
+    <div class="relative">
+      <a (click)="goToAddDemande()" class="flex items-center text-red-750 cursor-pointer hover:text-red-700">
+        <i class="fa-solid fa-paper-plane mr-2"></i>  Envoyer Demande
+      </a>
+    </div>
+    <div class="relative">
+      <a (click)="goToEtatLicences()" class="flex items-center text-red-750 cursor-pointer hover:text-red-700">
+        <i class="fa-solid fa-key mr-2"></i>  Licences
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Contenu dynamique -->
+<div class="px-4 py-6">
+  <router-outlet></router-outlet>
+</div>

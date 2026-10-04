@@ -1,0 +1,291 @@
+@if (showListOfDemandes) {
+<div class="pl-6">
+  <div class="flex justify-between items-center p-4 border-b">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Mes demandes de licences</h2>
+  </div>
+
+
+  <!-- ===== Filtres ===== -->
+  <div class="bg-white [box-shadow:0_4px_10px_rgba(0,0,0,0.25)] border border-green-500 rounded-lg p-4 mb-6 shadow-sm">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">Filtres de recherche</h3>
+
+    <div class="flex flex-wrap gap-x-4 gap-y-2 items-end">
+
+      <!-- Statut -->
+      <div class="flex-1 min-w-[150px]">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+        <select [(ngModel)]="filtreStatut" (change)="appliquerFiltres()"
+          class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Tous</option>
+          <option value="En attente">En attente</option>
+          <option value="Accepté">Accepté</option>
+          <option value="Refusé">Refusé</option>
+        </select>
+      </div>
+
+      <!-- Logiciel -->
+      <div class="flex-1 min-w-[150px]">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Logiciel</label>
+        <select [(ngModel)]="filtreLogiciel" (change)="appliquerFiltres()"
+          class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Tous</option>
+          <option *ngFor="let logiciel of logicielsDisponibles" [value]="logiciel">{{ logiciel }}</option>
+        </select>
+      </div>
+
+      <!-- Version -->
+      <div class="flex-1 min-w-[150px]">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Version du logiciel</label>
+        <select [(ngModel)]="filtreVersion" (change)="appliquerFiltres()"
+          class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Toutes</option>
+          <option *ngFor="let version of versionsDisponibles" [value]="version">{{ version }}</option>
+        </select>
+      </div>
+
+      <!-- Catégorie -->
+      <div class="flex-1 min-w-[150px]">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie du logiciel</label>
+        <select [(ngModel)]="filtreCategorie" (change)="appliquerFiltres()"
+          class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Toutes</option>
+          <option *ngFor="let cat of categoriesDisponibles" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <!-- ===== Tableau ===== -->
+  <div *ngIf="filteredDemandes.length > 0"
+    class="overflow-x-auto border border-green-500 rounded-lg [box-shadow:0_4px_10px_rgba(0,0,0,0.25)] shadow-sm">
+    <table class="w-full text-center text-gray-700 text-sm border-collapse">
+      <thead class="bg-gray-100 text-gray-800">
+        <tr>
+          <th class="p-3 border border-gray-200">Logiciel</th>
+          <th class="p-3 border border-gray-200">Vesrion de Logiciel</th>
+          <th class="p-3 border border-gray-200">Catégorie de Logiciel</th>
+          <th class="p-3 border border-gray-200">Fournisseur</th>
+          <th class="p-3 border border-gray-200">Licences</th>
+          <th class="p-3 border border-gray-200">Description</th>
+          <th class="p-3 border border-gray-200">Statut</th>
+          <th class="p-3 border border-gray-200">Employés</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let demande of filteredDemandes; let i = index" class="hover:bg-gray-50 border-t border-gray-200">
+          <td class="p-3 border border-gray-200">{{ demande.nomLogiciel }}</td>
+          @if(demande.versionLogiciel == null && demande.categorieLogiciel ==null){
+          <td class="p-3 border border-gray-200">non specifie</td>
+          <td class="p-3 border border-gray-200">non specifie</td>
+          }@else{
+          <td class="p-3 border border-gray-200">{{ demande.versionLogiciel }}</td>
+          <td class="p-3 border border-gray-200">{{ demande.categorieLogiciel }}</td>
+          }
+
+          <td class="p-3 border border-gray-200"> {{ demande.fournisseur && demande.fournisseur.trim() !== '' ?
+            demande.fournisseur : 'Non spécifié' }}
+          </td>
+          <td class="p-3 border border-gray-200">{{ demande.nbLicences }}</td>
+          <td class="p-3 border border-gray-200">{{ demande.description }}</td>
+          <td class="p-3 border border-gray-200">
+            <span class="px-2 py-1 text-xs font-semibold rounded-full" [ngClass]="{
+                    'bg-yellow-100 text-yellow-800': demande.statut === 'En attente',
+                    'bg-green-100 text-green-800': demande.statut === 'Acceptée',
+                    'bg-red-100 text-red-800': demande.statut === 'Refusée'
+                  }">
+              {{ demande.statut }}
+            </span>
+          </td>
+          <td class="p-3 border border-gray-200">
+            <button (click)="openEmployesModal(demande.employes)" class="text-blue-600 hover:underline text-sm">
+              Voir plus
+            </button>
+          </td>
+          
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- Aucun résultat -->
+  <div *ngIf="!loading && filteredDemandes.length === 0" class="text-gray-500 mt-4">
+    Aucune demande trouvée avec ces filtres.
+  </div>
+
+
+
+  <!-- MODALE DÉTAIL EMPLOYÉS -->
+  <div *ngIf="showModals" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white w-[30%] max-w-xl rounded shadow-lg p-5 relative max-h-[80vh] overflow-y-auto">
+
+      <!-- Bouton de fermeture -->
+      <button (click)="closeModal()"
+        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+
+      <h3 class="text-xl font-semibold text-gray-800 mb-6">Employés concernés</h3>
+
+      <!-- Timeline des employés -->
+      <div *ngIf="selectedEmployes.length > 0; else noEmp" class="relative pl-5">
+        <div class="border-l-[2px] border-gray-200 space-y-2 ml-0">
+
+          <div *ngFor="let emp of selectedEmployes; let i = index" class="relative flex items-start space-x-4">
+
+            <!-- Cercle coloré -->
+            <div class="absolute -left-3 top-2">
+              <div [ngClass]="[
+                  'w-5 h-5 rounded-full border-[2.5px] bg-white',
+                  i === 0 ? 'border-[#6d1b1b]' :
+                  i === 1 ? 'border-[#c79c3c]' :
+                  i === 2 ? 'border-[#4dc3d1]' :
+                  i === 3 ? 'border-[#6d1b1b]' :
+                  i === 4 ? 'border-[#50a78b]' :
+                  'border-gray-400'
+                ]">
+              </div>
+            </div>
+
+            <!-- Carte employé -->
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 w-full  hover:shadow-sm transition">
+              <div class="text-gray-800  font-semibold">{{ emp.nom }} {{ emp.prenom }}</div>
+              <div class="text-gray-500 font-sm mt-1">{{ emp.email }}</div>
+              <div class="text-gray-500 font-sm ">{{ emp.profil }}</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Aucun employé -->
+      <ng-template #noEmp>
+        <div class="text-gray-500">Aucun employé trouvé.</div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+}
+
+
+
+<!-- modiiiiiiiiiiiiiiiiiiiifffff  iciiiii -->
+@if (selectedDemande) {
+<div class="pl-6">
+  <!-- Titre -->
+  <div class="flex justify-between items-center p-4 border-b">
+    <h2 class="text-2xl font-bold text-gray-800">Liste des Employés Concernés</h2>
+  </div>
+
+  <!-- Tableau -->
+  @if (selectedDemande.employes && selectedDemande.employes.length > 0) {
+  <div
+    class="overflow-x-auto border border-green-500 rounded-lg [box-shadow:0_4px_10px_rgba(0,0,0,0.25)] shadow-sm mt-6">
+    <table class="w-full text-center text-gray-700 text-sm border-collapse">
+      <thead class="bg-gray-100 text-gray-800">
+        <tr>
+          <th class="p-3 border border-gray-200">Nom et Prénom</th>
+          <th class="p-3 border border-gray-200">Email</th>
+          <th class="p-3 border border-gray-200">Affectation</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (d of selectedDemande.employes; track d.id) {
+        <tr class="hover:bg-gray-50 border-t border-gray-200">
+          <td class="p-3 border border-gray-200 font-medium text-gray-800">
+            {{ d.nom }} {{ d.prenom }}
+          </td>
+          <td class="p-3 border border-gray-200 text-gray-600">
+            {{ d.email }}
+          </td>
+          <td class="p-3 border border-gray-200">
+            <button (click)="getLicenceNoAffecteraffecter(selectedDemande.logicielId,d.id)"
+              class="bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium px-3 py-1 rounded transition duration-150">
+              Affecter
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  } @else {
+  <!-- Aucun employé -->
+  <div class="text-gray-500 mt-6 text-center p-4">
+    Aucun employé concerné par cette demande.
+  </div>
+  }
+</div>
+}
+@if (showAffectationForm && idEmploye) {
+<!-- Fond sombre du modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg p-6 max-w-xl w-full">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">Affecter une licence</h3>
+
+    @if (licencesNonAffectees.length > 0) {
+    <select id="selectedLicenceId" (change)="onLicenceChange($event)"
+      class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+      <option value="">Sélectionnez une licence</option>
+      @for (licence of licencesNonAffectees; track licence.id) {
+      <option [value]="licence.id">
+        🔑 {{ licence.cleLicence }} |
+        📅 {{ licence.dateDebut }} → {{ licence.dateFin }} |
+        💰 {{ licence.prix }} €
+      </option>
+      }
+    </select>
+
+    <!-- Boutons -->
+    <div class="flex justify-between space-x-3 mt-6">
+      <button (click)="showAffectationForm = false"
+        class="px-4 py-2 border border-gray-800 rounded hover:bg-gray-200 transition duration-200">
+        Annuler
+      </button>
+      <button (click)="affecter()" [disabled]="!selectedLicenceId"
+        class="px-4 py-2 border border-blue-800 text-blue-800 rounded hover:bg-blue-800 hover:text-white transition duration-200">
+        Confirmer
+      </button>
+    </div>
+
+    } @else {
+    <p class="text-sm text-gray-500 italic mb-4">Aucune licence disponible pour l'affectation.</p>
+    <div class="flex justify-end">
+      <button (click)="showAffectationForm = false"
+        class="px-4 py-2 border border-gray-800 rounded hover:bg-gray-200 transition duration-200">
+        Fermer
+      </button>
+    </div>
+    }
+  </div>
+</div>
+}
+
+
+<!--notification existante par ce code -->
+<!-- === NOTIFICATION CENTRALE PROFESSIONNELLE === -->
+@if (showModal) {
+<div class="notification-container">
+  <div class="notification-box">
+    <div class="notification-icon">
+      <!-- Icône succès animée -->
+      @if(modalType === 'success'){
+      <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" stroke="#28a745" />
+        <path class="checkmark__check" fill="none" stroke="#28a745" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+      </svg>
+      }
+      <!-- Icône erreur -->
+      @if(modalType === 'error'){
+      <i class="fas fa-times-circle text-red-500 text-5xl"></i>
+      }
+    </div>
+    <h3 class="notification-title">{{ modalTitle }}</h3>
+
+    <p class="notification-message">{{modalMessage}}</p>
+    <button (click)="showModal = false" class="notification-button">OK</button>
+  </div>
+</div>
+
+}

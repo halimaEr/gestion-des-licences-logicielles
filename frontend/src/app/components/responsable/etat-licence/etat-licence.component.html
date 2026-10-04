@@ -1,0 +1,257 @@
+<div class="pl-6">
+  <div class="flex justify-between items-center p-4 border-b">
+    <h2 class="text-xl font-semibold text-gray-800">Etat de Licences</h2>
+    <button (click)="toggleModeRenouvellement()"
+      class="bg-red-750 text-white px-4 py-2 rounded-md text-sm flex items-center">
+      Soumettre une demande de renouvellement
+    </button>
+  </div>
+  <div *ngIf="loading" class="text-gray-500">Chargement des licences…</div>
+  <div *ngIf="error" class="text-red-500">{{ error }}</div>
+
+  <div *ngIf="!loading && (licences?.length || 0) === 0" class="text-gray-500 italic">
+    Aucune licence trouvée pour votre département.
+  </div>
+
+  <!-- Barre d'action de renouvellement groupé -->
+  <div *ngIf="modeRenouvellement"
+    class="mb-6 p-4 bg-blue-50 border border-blue-300 rounded-lg flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+    <div class="flex-1">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Nouvelle date de fin (commune)</label>
+      <input type="date" [formControl]="formGroupRenouvellement.controls.dateFinCommune"
+        class="w-full sm:w-auto px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      @if(formGroupRenouvellement.controls.dateFinCommune.invalid &&
+      formGroupRenouvellement.controls.dateFinCommune.touched) {
+      <p class="mt-1 text-sm text-red-600">La date est requise.</p>
+      }
+    </div>
+    <div class="flex gap-3">
+      <button (click)="onSubmitRenouvellementGroupe()"
+        [disabled]="formGroupRenouvellement.invalid || getSelectionnees().length === 0 "
+        class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2">
+        <span>Envoyer ({{ getSelectionnees().length }})</span>
+      </button>
+      <button (click)="toggleModeRenouvellement()"
+        class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2.5 rounded-lg font-medium transition">
+        Annuler
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Filtres ===== -->
+  <div class="bg-white [box-shadow:0_4px_10px_rgba(0,0,0,0.25)] border border-green-500 rounded-lg p-4 mb-6 shadow-sm">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">Filtres de recherche</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
+
+      <!-- Statut -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+        <select [(ngModel)]="filtreStatut" (change)="appliquerFiltres()"
+          class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Tous</option>
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="EXPIRED">EXPIRED</option>
+          <option value="EXPIRED">LIBEREE</option>
+        </select>
+      </div>
+
+      <!-- Logiciel -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Logiciel</label>
+        <select [(ngModel)]="filtreLogiciel" (change)="appliquerFiltres()"
+          class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Tous</option>
+          <option *ngFor="let logiciel of logicielsDisponibles" [value]="logiciel">
+            {{ logiciel }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Version Logiciel -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Version du logiciel</label>
+        <select [(ngModel)]="filtreVersion" (change)="appliquerFiltres()"
+          class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Toutes</option>
+          <option *ngFor="let version of versionsDisponibles" [value]="version">{{ version }}</option>
+        </select>
+      </div>
+
+      <!-- Catégorie Logiciel -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie du logiciel</label>
+        <select [(ngModel)]="filtreCategorie" (change)="appliquerFiltres()"
+          class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Toutes</option>
+          <option *ngFor="let cat of categoriesDisponibles" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+
+      <!-- Date Expiration -->
+      <!-- Filtre Année -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Année expiration</label>
+        <select [(ngModel)]="filtreAnnee" (change)="appliquerFiltres()" class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Toutes</option>
+          <option *ngFor="let annee of anneesDisponibles" [value]="annee">{{ annee }}</option>
+        </select>
+      </div>
+
+      <!-- Filtre Mois -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Mois expiration</label>
+        <select [(ngModel)]="filtreMois" (change)="appliquerFiltres()" class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">Tous</option>
+          <option *ngFor="let m of moisDisponibles" [value]="m.value">{{ m.nom }}</option>
+        </select>
+      </div>
+
+
+      <!-- Bouton reset -->
+      <!--      <div class="flex items-end">-->
+      <!--        <button (click)="resetFiltres()"-->
+      <!--                class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-sm px-4 py-2 rounded w-full">-->
+      <!--          Réinitialiser les filtres-->
+      <!--        </button>-->
+      <!--      </div>-->
+    </div>
+  </div>
+
+  <!-- ===== Tableau ===== -->
+  <div *ngIf="!loading && (filteredLicences?.length || 0) > 0"
+    class="overflow-x-auto border border-green-500 rounded-lg [box-shadow:0_4px_10px_rgba(0,0,0,0.25)] shadow-sm">
+    <table class="w-full text-center text-gray-700 text-sm border-collapse">
+      <thead class="bg-gray-100 text-gray-800">
+        <tr>
+          @if(modeRenouvellement) {
+          <th class="p-3 border">Sélection</th>
+          }
+          <th class="p-3 border">Logiciel</th>
+          <th class="p-3 border">Catégorie</th>
+          <th class="p-3 border">Version</th>
+          <th class="p-3 border">Clé licence</th>
+          <th class="p-3 border">Employé</th>
+          <th class="p-3 border">Date début</th>
+          <th class="p-3 border">Date fin</th>
+          <th class="p-3 border">Temps restant</th>
+          <th class="p-3 border">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (lic of filteredLicences; track lic.licenceId) {
+        <tr class="hover:bg-gray-50 border-b">
+          @if(modeRenouvellement) {
+          <td class="p-3 border">
+            <input type="checkbox" [checked]="lic.licenceId != null ? licencesSelectionnees[lic.licenceId] : false"
+              (change)="toggleSelection(lic.licenceId)" class="w-5 h-5 text-blue-600 rounded" />
+          </td>
+          }
+          <td class="p-3 border">{{ lic.logicielNom }}</td>
+          <td class="p-3 border">{{ lic.categorieLogiciel }}</td>
+          <td class="p-3 border">{{ lic.vesrionLogiciel }}</td>
+          <td class="p-3 border">{{ lic.cleLicence }}</td>
+          <td class="p-3 border">{{ lic.nom + ' ' + lic.prenom || '—' }}</td>
+          <td class="p-3 border">{{ formatDate(lic.dateDebut) }}</td>
+          <td class="p-3 border">{{ lic.dateFin ? formatDate(lic.dateFin) : '—' }}</td>
+
+          <!-- Temps restant -->
+          <td class="p-4 border text-center">
+            <ng-container *ngIf="timeRemainingObj(lic) as timer">
+              <div class="flex justify-center items-center gap-2 text-xs font-medium">
+                <div *ngFor="let part of [
+        { label: 'Mois', value: timer?.months ?? 0 },
+        { label: 'J', value: timer?.days ?? 0 },
+        { label: 'H', value: timer?.hours ?? 0 },
+        { label: 'Min', value: timer?.minutes ?? 0 },
+        { label: 'S', value: timer?.seconds ?? 0 }
+      ]" class="px-2 py-1 rounded border bg-white shadow-sm flex flex-col items-center w-10" [ngClass]="{
+             'border-green-400 text-green-600': (timer?.totalDays ?? 0) > 365,       
+             'border-yellow-400 text-yellow-600': (timer?.totalDays ?? 0) >= 180 && (timer?.totalDays ?? 0) <= 365, 
+             'border-red-400 text-red-600': (timer?.totalDays ?? 0) < 180              
+           }">
+                  <span class="text-sm font-bold">{{ part.value }}</span>
+                  <span class="text-[9px] text-gray-500">{{ part.label }}</span>
+                </div>
+              </div>
+            </ng-container>
+          </td>
+
+          <!-- Statut -->
+          <td class="p-3 border">
+            <span class="px-2 py-1 text-xs font-semibold rounded-full" [ngClass]="{
+              'bg-green-100 text-green-800': lic.statut === 'ACTIVE',
+              'bg-red-100 text-red-800': lic.statut === 'EXPIRED',
+              'bg-yellow-100 text-yellow-800': lic.statut === 'LIBEREE',
+            }">
+              {{ lic.statut }}
+            </span>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if(showRenouvlerForm){
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white shadow-xl w-full max-w-xl mx-4 rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h1 class="text-xl font-bold text-gray-700 text-center">Demander le renouvellement</h1>
+    </div>
+    <form [formGroup]="formGroupRenuvler" class="px-6 py-6" (ngSubmit)="onSubmitRenouvellement()">
+      <div class="mb-6">
+        <input type="date" id="dateFinARenouvler" formControlName="dateFinARenouvler" [class]="(formGroupRenuvler.controls.dateFinARenouvler.touched || formGroupRenuvler.controls.dateFinARenouvler.dirty)
+                ? (formGroupRenuvler.controls.dateFinARenouvler.invalid 
+                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                  : 'border-gray-300 focus:ring-gray-500 focus:border-gray-500')
+                  : 'border-gray-300 focus:ring-gray-500 focus:border-gray-500'"
+          class="w-full text-center px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 transition duration-200"
+          placeholder="Entrez la nouvelle date de fin" />
+        @if(formGroupRenuvler.controls.dateFinARenouvler.invalid &&
+        formGroupRenuvler.controls.dateFinARenouvler.touched){
+        <p class="mt-1 text-sm text-red-600">La date de fin est requise.</p>
+        }
+      </div>
+      <div class="flex justify-between space-x-3">
+        <button type="button" (click)="annulerRenouvellement()"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200">
+          Annuler
+        </button>
+        <button type="submit" [disabled]="formGroupRenuvler.invalid"
+          class="px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 disabled:opacity-60 disabled:cursor-not-allowed transition duration-200 flex items-center">
+          Envoyer la demande
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+
+<!--notification existante par ce code -->
+<!-- === NOTIFICATION CENTRALE PROFESSIONNELLE === -->
+@if (showModal) {
+<div class="notification-container">
+  <div class="notification-box">
+    <div class="notification-icon">
+      <!-- Icône succès animée -->
+      @if(modalType === 'success'){
+      <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" stroke="#28a745" />
+        <path class="checkmark__check" fill="none" stroke="#28a745" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+      </svg>
+      }
+      <!-- Icône erreur -->
+      @if(modalType === 'error'){
+      <i class="fas fa-times-circle text-red-500 text-5xl"></i>
+      }
+    </div>
+    <h3 class="notification-title">{{ modalTitle }}</h3>
+
+    <p class="notification-message">{{modalMessage}}</p>
+    <button (click)="showModal = false" class="notification-button">OK</button>
+  </div>
+</div>
+
+}

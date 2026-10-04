@@ -1,0 +1,54 @@
+<!-- ========== NAVBAR FIXE ========== -->
+<nav class="bg-white shadow-md">
+  <app-layout></app-layout>
+  <!-- Barre de navigation -->
+  <div class="w-full bg-gray-200 px-4 py-2 flex flex-wrap justify-center sm:justify-start gap-y-2 gap-x-8 sm:gap-x-12 md:gap-x-16">
+
+    <!-- Stats -->
+    <div class="relative">
+      <a 
+       routerLink="/dash-gestionnaire" class="flex items-center text-red-750 hover:text-red-700">
+        <i class="fa-solid fa-chart-simple mr-2"></i>
+        Statistiques
+      </a>
+     
+    </div>
+
+    <div class="relative">
+      <a routerLink="/dash-gestionnaire/demandes"
+        class="flex items-center text-red-750 cursor-pointer hover:text-red-700">
+        <i class="	fas fa-folder-open mr-2"></i>
+        Demandes
+      </a>
+    </div>
+
+    <div class="relative">
+      <a routerLink="/dash-gestionnaire/logiciel"
+       class="flex items-center text-red-750 cursor-pointer hover:text-red-700">
+       <i class="fa-solid fa-screwdriver-wrench mr-2"></i>  Logiciels
+      </a>
+    </div>
+    <div class="relative">
+      <a routerLink="/dash-gestionnaire/licences"
+       class="flex items-center text-red-750 cursor-pointer hover:text-red-700">
+       <i class="fa-solid fa-key mr-2"></i>  Licences
+      </a>
+    </div>
+    <div class="relative">
+      <a routerLink="/dash-gestionnaire/affectation-details" class="flex items-center text-red-750 cursor-pointer hover:text-red-700">
+        <i class="fa-solid fa-link mr-2"></i>  Affectation
+      </a>
+    </div>
+    <div class="relative">
+      <a routerLink="/dash-gestionnaire/renouvellement" class="flex items-center text-red-750 cursor-pointer hover:text-red-700">
+        <i class="fa-solid fa-envelopes-bulk mr-2"></i> Renouvellement
+      </a>
+    </div>
+   
+  </div>
+</nav>
+
+<!-- Contenu dynamique -->
+<div class="px-4 py-6">
+  <router-outlet></router-outlet>
+</div>

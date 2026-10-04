@@ -1,0 +1,6 @@
+
+  canvas {
+    max-height: 288px !important; /* 72 * 4 = 288 */
+    margin: 0 auto;
+    display: block;
+  }

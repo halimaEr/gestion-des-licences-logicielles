@@ -1,0 +1,134 @@
+.dropdown-menu {
+  position: fixed !important;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  min-width: 120px;
+}
+
+.dropdown-menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dropdown-menu button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f3f4f6;
+}
+
+
+/* === NOTIFICATION CENTRALE PROFESSIONNELLE === */
+.notification-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* Toujours au-dessus de tout */
+  pointer-events: none;
+}
+
+.notification-container .notification-box {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1000px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  width: 380px;
+  max-width: 90vw;
+  padding: 28px;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.9);
+  animation: notificationAppear 0.4s ease forwards;
+  pointer-events: auto;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@keyframes notificationAppear {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.notification-icon {
+  margin: 0 auto 16px;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkmark {
+  width: 70px;
+  height: 70px;
+}
+
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-linecap: round;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark__check {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  stroke-width: 2;
+  stroke-linecap: round;
+  animation: dash 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.2s forwards;
+}
+
+@keyframes stroke {
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes dash {
+  100% { stroke-dashoffset: 0; }
+}
+
+.notification-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+}
+
+.notification-message {
+  color: #6c757d;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.notification-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-weight: 500;
+}
+
+.notification-button:hover {
+  background-color: #0056b3;
+}
